@@ -1,0 +1,68 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    tools:context="com.stc.fullscreen.clock.FullscreenActivity">
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/date_time_layout"
+        android:layout_centerVertical="true">
+
+        <com.stc.fullscreen.clock.ScalableTextView android:id="@+id/fullscreen_content"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="wrap_content"
+                                                   android:keepScreenOn="true"
+                                                   android:textColor="#33b5e5"
+                                                   android:textSize="144sp"
+                                                   android:textStyle="bold"
+                                                   android:text="00:00:00"
+                                                   android:maxLines="1"
+                                                   android:gravity="center"/>
+
+        <com.stc.fullscreen.clock.ScalableTextView android:id="@+id/date_content"
+                                                       android:layout_width="match_parent"
+                                                       android:layout_height="wrap_content"
+                                                       android:keepScreenOn="true"
+                                                       android:textColor="#33b5e5"
+                                                       android:textSize="80sp"
+                                                       android:textStyle="bold"
+                                                       android:gravity="center"
+                                                       android:text="23 Dec"
+                                                       android:layout_marginBottom="32dp"
+                                                       android:layout_margin="16dp"
+                                                       android:layout_below="@+id/fullscreen_content"
+                                                       android:singleLine="true" />
+    </LinearLayout>
+
+
+    <!-- This FrameLayout insets its children based on system windows using
+         android:fitsSystemWindows. -->
+    <FrameLayout android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <LinearLayout android:id="@+id/fullscreen_content_controls"
+            style="?metaButtonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:background="@color/black_overlay"
+            android:orientation="horizontal"
+            tools:ignore="UselessParent">
+
+            <Button android:id="@+id/dummy_button"
+                style="?metaButtonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/dummy_button" />
+
+        </LinearLayout>
+    </FrameLayout>
+
+</RelativeLayout>
