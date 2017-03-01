@@ -3,6 +3,7 @@ package com.stc.fullscreen.clock;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -70,10 +71,11 @@ public class ClockPresenter implements ClockContract.Presenter {
 
 	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 	@Override
-	public void toggleSpeakingClock(ComponentName mServiceComponent) {
-
+	public void toggleSpeakingClock(ComponentName mServiceComponent, JobScheduler scheduler) {
 		JobInfo.Builder builder = new JobInfo.Builder(SPEAKING_JOB_ID, mServiceComponent);
-
+		int period = 1000*60*60;
+		builder.setPeriodic(period);
+		scheduler.schedule(builder.build());
 	}
 
 
