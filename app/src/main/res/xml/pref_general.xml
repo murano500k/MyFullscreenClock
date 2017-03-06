@@ -1,9 +1,0 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="brightness_switch"
-        android:summary="@string/pref_description_auto_brightness"
-        android:title="@string/pref_title_auto_brightness"/>
-
-</PreferenceScreen>

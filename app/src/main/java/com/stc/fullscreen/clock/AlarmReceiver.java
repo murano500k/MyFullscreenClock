@@ -17,6 +17,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 	public static final String TAG = "AlarmReceiver";
 
 	public static final String ACTION_SET_BRIGHTNESS = "com.stc.fullscreenclock.ACTION_SET_BRIGHTNESS";
+	public static final int REQUEST_SET_BRIGHTNESS = 5641;
 	public static final int HOUR_DAYTIME_STARTS = 8;
 	public static final int HOUR_NIGHTTIME_STARTS = 23;
 

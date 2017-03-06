@@ -2,7 +2,8 @@ package com.stc.fullscreen.clock;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.ComponentName;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -24,15 +25,19 @@ import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+import static com.stc.fullscreen.clock.AlarmReceiver.ACTION_SET_BRIGHTNESS;
+import static com.stc.fullscreen.clock.AlarmReceiver.REQUEST_SET_BRIGHTNESS;
+import static com.stc.fullscreen.clock.SpeakingService.ACTION_SPEAK_TIME;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class FullscreenActivity extends AppCompatActivity implements ClockContract.View{
+public class FullscreenActivity extends AppCompatActivity {
 	private static final String TAG = "FullscreenActivity";
 	/**
 	 * Whether or not the system UI should be auto-hidden after
@@ -52,17 +57,20 @@ public class FullscreenActivity extends AppCompatActivity implements ClockContra
 	 */
 	private static final int UI_ANIMATION_DELAY = 300;
 	private static final int REQUEST_CHANGE_BRIGHTNESS = 19932;
+	private static final int REQUEST_SPEAK = 74;
 
-	private ScalableTextView mTextView;
-	private ScalableTextView mDateView;
+	private ScaleableTextView mTextView;
+	private ScaleableTextView mDateView;
 	private View mControlsView;
 	private boolean mVisible;
 	private static final int TICK_DELAY_MILLIS = 250;
+	private static final String MY_TIME_FORMAT = "HH:mm:ss";
+	private static final String MY_DATE_FORMAT= "EEE dd MMM";
 
 
 	private final Handler mHandler = new Handler(Looper.getMainLooper());
-	private final SimpleDateFormat mTimeFormat = new SimpleDateFormat("HH:mm:ss", Locale.US);
-	private final SimpleDateFormat mDateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.US);
+	private final SimpleDateFormat mTimeFormat = new SimpleDateFormat(MY_TIME_FORMAT, Locale.US);
+	private final SimpleDateFormat mDateFormat = new SimpleDateFormat(MY_DATE_FORMAT, Locale.US);
 
 	private final Runnable mTickListener = new Runnable() {
 		@Override
@@ -73,7 +81,6 @@ public class FullscreenActivity extends AppCompatActivity implements ClockContra
 		}
 	};
 	private LinearLayout mDateTimeView;
-	private ClockContract.Presenter presenter;
 
 
 
@@ -85,23 +92,56 @@ public class FullscreenActivity extends AppCompatActivity implements ClockContra
 
 		mVisible = true;
 		mControlsView = findViewById(R.id.fullscreen_content_controls);
-		mTextView = (ScalableTextView) findViewById(R.id.fullscreen_content);
-		mDateView = (ScalableTextView) findViewById(R.id.date_content);
+		mTextView = (ScaleableTextView) findViewById(R.id.fullscreen_content);
+		mDateView = (ScaleableTextView) findViewById(R.id.date_content);
 		mDateTimeView=(LinearLayout) findViewById(R.id.date_time_layout);
-
-
-		// Set up the user interaction to manually show or hide the system UI.
 		mDateTimeView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				toggle();
 			}
 		});
-
 		findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
 		findViewById(R.id.dummy_button).setOnClickListener(mButtonClickListener);
 		mTickListener.run();
-		new ClockPresenter(this,AlarmReceiver.getPendingIntent(this));
+		scheduleSpeakingTime();
+		scheduleAutoBrightness();
+		//new SettingsPresenter(this,AlarmReceiver.getPendingIntent(this));
+	}
+	private void scheduleSpeakingTime(){
+		Intent intent=new Intent(this, SpeakingService.class);
+		intent.setAction(ACTION_SPEAK_TIME);
+		startService(intent);
+		PendingIntent pendingIntent= PendingIntent.getService(this, REQUEST_SPEAK, intent, 0);
+		AlarmManager am=(AlarmManager) getSystemService(ALARM_SERVICE);
+		Calendar calendar=Calendar.getInstance();
+		Date date=calendar.getTime();
+		date.setMinutes(0);
+		int period = 1000*60*60;
+		am.setRepeating(
+				AlarmManager.ELAPSED_REALTIME_WAKEUP,
+				date.getTime(),
+				period,
+				pendingIntent
+		);
+
+	}
+	private void scheduleAutoBrightness(){
+		Intent intent=new Intent(this, AlarmReceiver.class);
+		intent.setAction(ACTION_SET_BRIGHTNESS);
+		sendBroadcast(intent);
+		PendingIntent pendingIntent= PendingIntent.getBroadcast(this, REQUEST_SET_BRIGHTNESS, intent, 0);
+		AlarmManager am=(AlarmManager) getSystemService(ALARM_SERVICE);
+		Calendar calendar=Calendar.getInstance();
+		Date date=calendar.getTime();
+		date.setMinutes(0);
+		int period = 1000*60*60;
+		am.setRepeating(
+				AlarmManager.ELAPSED_REALTIME_WAKEUP,
+				date.getTime(),
+				period,
+				pendingIntent
+		);
 	}
 
 	@Override
@@ -126,10 +166,6 @@ public class FullscreenActivity extends AppCompatActivity implements ClockContra
 			openAndroidPermissionsMenu();
 			return;
 		}
-		presenter.toggleAutoBrightnessChange(this);
-	}
-	private void toggleSpeakingClock(){
-		presenter.toggleSpeakingClock(new ComponentName(this, SpeakTimeJobService.class));
 	}
 
 
@@ -293,14 +329,4 @@ public class FullscreenActivity extends AppCompatActivity implements ClockContra
 				Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
 	}
 
-
-	@Override
-	public void setPresenter(ClockContract.Presenter p) {
-		this.presenter=p;
-	}
-
-	@Override
-	public void showMessage(String m) {
-		Toast.makeText(this,m, Toast.LENGTH_SHORT).show();
-	}
 }

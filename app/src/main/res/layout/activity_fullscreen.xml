@@ -13,7 +13,7 @@
         android:id="@+id/date_time_layout"
         android:layout_centerVertical="true">
 
-        <com.stc.fullscreen.clock.ScalableTextView android:id="@+id/fullscreen_content"
+        <com.stc.fullscreen.clock.ScaleableTextView android:id="@+id/fullscreen_content"
                                                    android:layout_width="match_parent"
                                                    android:layout_height="wrap_content"
                                                    android:keepScreenOn="true"
@@ -24,19 +24,18 @@
                                                    android:maxLines="1"
                                                    android:gravity="center"/>
 
-        <com.stc.fullscreen.clock.ScalableTextView android:id="@+id/date_content"
+        <com.stc.fullscreen.clock.ScaleableTextView android:id="@+id/date_content"
                                                        android:layout_width="match_parent"
                                                        android:layout_height="wrap_content"
                                                        android:keepScreenOn="true"
                                                        android:textColor="#33b5e5"
                                                        android:textSize="80sp"
-                                                       android:textStyle="bold"
                                                        android:gravity="center"
                                                        android:text="23 Dec"
                                                        android:layout_marginBottom="32dp"
                                                        android:layout_margin="16dp"
                                                        android:layout_below="@+id/fullscreen_content"
-                                                       android:singleLine="true" />
+                                                       android:maxLines="1" />
     </LinearLayout>
 
 
@@ -60,7 +59,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/dummy_button" />
+                android:text="settings" />
 
         </LinearLayout>
     </FrameLayout>
