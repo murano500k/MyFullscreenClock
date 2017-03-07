@@ -1,44 +1,28 @@
 package com.stc.fullscreen.clock;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Build;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
-
-import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-import static com.stc.fullscreen.clock.AlarmReceiver.ACTION_SET_BRIGHTNESS;
-import static com.stc.fullscreen.clock.AlarmReceiver.REQUEST_SET_BRIGHTNESS;
-import static com.stc.fullscreen.clock.SpeakingService.ACTION_SPEAK_TIME;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
 public class FullscreenActivity extends AppCompatActivity {
-	private static final String TAG = "FullscreenActivity";
+	public static final String TAG = "FullscreenActivity";
 	/**
 	 * Whether or not the system UI should be auto-hidden after
 	 * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -56,16 +40,16 @@ public class FullscreenActivity extends AppCompatActivity {
 	 * and a change of the status and navigation bar.
 	 */
 	private static final int UI_ANIMATION_DELAY = 300;
-	private static final int REQUEST_CHANGE_BRIGHTNESS = 19932;
-	private static final int REQUEST_SPEAK = 74;
+	public static final int REQUEST_CHANGE_BRIGHTNESS = 19932;
+	public static final int REQUEST_SPEAK = 74;
+	public static final int  REQUEST_CHANGE_SETTINGS = 43265;
 
-	private ScaleableTextView mTextView;
-	private ScaleableTextView mDateView;
-	private View mControlsView;
-	private boolean mVisible;
-	private static final int TICK_DELAY_MILLIS = 250;
-	private static final String MY_TIME_FORMAT = "HH:mm:ss";
-	private static final String MY_DATE_FORMAT= "EEE dd MMM";
+	public  ScaleableTextView mTimeView;
+	public  ScaleableTextView mDateView;
+	public  boolean mVisible;
+	public  static final int TICK_DELAY_MILLIS = 250;
+	public  static final String MY_TIME_FORMAT = "HH:mm:ss";
+	public  static final String MY_DATE_FORMAT= "EEE dd MMM";
 
 
 	private final Handler mHandler = new Handler(Looper.getMainLooper());
@@ -75,13 +59,13 @@ public class FullscreenActivity extends AppCompatActivity {
 	private final Runnable mTickListener = new Runnable() {
 		@Override
 		public void run() {
-			mTextView.setText(mTimeFormat.format(Calendar.getInstance().getTime()));
+			mTimeView.setText(mTimeFormat.format(Calendar.getInstance().getTime()));
 			mDateView.setText(mDateFormat.format(Calendar.getInstance().getTime()));
 			mHandler.postDelayed(mTickListener, TICK_DELAY_MILLIS);
 		}
 	};
-	private LinearLayout mDateTimeView;
-
+	private View mControlsView;
+	private View mAllView;
 
 
 	@Override
@@ -92,57 +76,49 @@ public class FullscreenActivity extends AppCompatActivity {
 
 		mVisible = true;
 		mControlsView = findViewById(R.id.fullscreen_content_controls);
-		mTextView = (ScaleableTextView) findViewById(R.id.fullscreen_content);
+		mTimeView = (ScaleableTextView) findViewById(R.id.time_content);
 		mDateView = (ScaleableTextView) findViewById(R.id.date_content);
-		mDateTimeView=(LinearLayout) findViewById(R.id.date_time_layout);
-		mDateTimeView.setOnClickListener(new View.OnClickListener() {
+		mControlsView= findViewById(R.id.fullscreen_content_controls);
+		mAllView = findViewById(R.id.fullscreen);
+		mAllView.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View view) {
+			public void onClick(View v) {
+				Log.d(TAG, "onClick: ");
 				toggle();
 			}
 		});
 		findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
 		findViewById(R.id.dummy_button).setOnClickListener(mButtonClickListener);
 		mTickListener.run();
-		scheduleSpeakingTime();
-		scheduleAutoBrightness();
-		//new SettingsPresenter(this,AlarmReceiver.getPendingIntent(this));
+		applyPrefsValues();
 	}
-	private void scheduleSpeakingTime(){
-		Intent intent=new Intent(this, SpeakingService.class);
-		intent.setAction(ACTION_SPEAK_TIME);
-		startService(intent);
-		PendingIntent pendingIntent= PendingIntent.getService(this, REQUEST_SPEAK, intent, 0);
-		AlarmManager am=(AlarmManager) getSystemService(ALARM_SERVICE);
-		Calendar calendar=Calendar.getInstance();
-		Date date=calendar.getTime();
-		date.setMinutes(0);
-		int period = 1000*60*60;
-		am.setRepeating(
-				AlarmManager.ELAPSED_REALTIME_WAKEUP,
-				date.getTime(),
-				period,
-				pendingIntent
-		);
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(requestCode==REQUEST_CHANGE_SETTINGS){
+			applyPrefsValues();
+		}
+	}
+
+	private void applyPrefsValues(){
+		SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+		String fontPref = sharedPref.getString(SettingsActivity.KEY_PREF_FONT, null);
+		int colorPref = sharedPref.getInt(SettingsActivity.KEY_PREF_COLOR, -1);
+		Log.d(TAG, "applyPrefsValues: color = "+colorPref);
+		Log.d(TAG, "applyPrefsValues: font = "+fontPref);
+
+		if(colorPref!=-1) {
+			mTimeView.setTextColor(colorPref);
+			mDateView.setTextColor(colorPref);
+		}
+		if(fontPref!=null) {
+			mTimeView.setTypeface(SettingsActivity.getTypefaceFromName(fontPref));
+			mDateView.setTypeface(SettingsActivity.getTypefaceFromName(fontPref));
+		}
 
 	}
-	private void scheduleAutoBrightness(){
-		Intent intent=new Intent(this, AlarmReceiver.class);
-		intent.setAction(ACTION_SET_BRIGHTNESS);
-		sendBroadcast(intent);
-		PendingIntent pendingIntent= PendingIntent.getBroadcast(this, REQUEST_SET_BRIGHTNESS, intent, 0);
-		AlarmManager am=(AlarmManager) getSystemService(ALARM_SERVICE);
-		Calendar calendar=Calendar.getInstance();
-		Date date=calendar.getTime();
-		date.setMinutes(0);
-		int period = 1000*60*60;
-		am.setRepeating(
-				AlarmManager.ELAPSED_REALTIME_WAKEUP,
-				date.getTime(),
-				period,
-				pendingIntent
-		);
-	}
+
+
 
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
@@ -158,69 +134,10 @@ public class FullscreenActivity extends AppCompatActivity {
 		@Override
 		public void onClick(View v) {
 			Intent intent=new Intent(FullscreenActivity.this, SettingsActivity.class);
-			startActivity(intent);
+			startActivityForResult(intent, REQUEST_CHANGE_SETTINGS);
 		}
 	};
-	public void enableBrightnessChange() {
-		if(!checkSystemWritePermission()) {
-			openAndroidPermissionsMenu();
-			return;
-		}
-	}
 
-
-
-	private boolean checkSystemWritePermission() {
-		boolean retVal = true;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			retVal = Settings.System.canWrite(this);
-			Log.d(TAG, "Can Write Settings: " + retVal);
-			if(retVal){
-				Toast.makeText(this, "Write allowed :-)", Toast.LENGTH_LONG).show();
-			}else{
-				Toast.makeText(this, "Write not allowed :-(", Toast.LENGTH_LONG).show();
-			}
-		}else if (ContextCompat.checkSelfPermission(FullscreenActivity.this,
-				Manifest.permission.WRITE_SETTINGS)
-				!= PackageManager.PERMISSION_GRANTED) {
-			return false;
-		}
-		return retVal;
-	}
-	private void openAndroidPermissionsMenu() {
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-			intent.setData(Uri.parse("package:" + this.getPackageName()));
-			startActivity(intent);
-		}else {
-			ActivityCompat.requestPermissions(FullscreenActivity.this,
-					new String[]{Manifest.permission.WRITE_SETTINGS},
-					REQUEST_CHANGE_BRIGHTNESS);
-		}
-	}
-	@SuppressLint("NewApi")
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		if (Settings.System.canWrite(this)){
-			Log.d("TAG", "CODE_WRITE_SETTINGS_PERMISSION success");
-			enableBrightnessChange();
-		}
-	}
-
-	@Override
-	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-		if (grantResults[0] == PERMISSION_GRANTED) {
-			enableBrightnessChange();
-			Log.d(TAG, "granted");
-		}else {
-			//enableBrightnessChange();
-			Log.d(TAG, "not granted");
-		}
-		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-
-	}
 
 	@Override
 	public void onStop() {
@@ -269,7 +186,7 @@ public class FullscreenActivity extends AppCompatActivity {
 			// Note that some of these constants are new as of API 16 (Jelly Bean)
 			// and API 19 (KitKat). It is safe to use them, as they are inlined
 			// at compile-time and do nothing on earlier devices.
-			mTextView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+			mTimeView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
 					| View.SYSTEM_UI_FLAG_FULLSCREEN
 					| View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 					| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -281,7 +198,7 @@ public class FullscreenActivity extends AppCompatActivity {
 	@SuppressLint("InlinedApi")
 	private void show() {
 		// Show the system bar
-		mTextView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+		mTimeView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
 		mVisible = true;
 
@@ -323,10 +240,10 @@ public class FullscreenActivity extends AppCompatActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		mHandler.removeCallbacks(mTickListener);
-		mTextView = null;
-		Settings.System.putInt(this.getContentResolver(),
+		mTimeView = null;
+		/*Settings.System.putInt(this.getContentResolver(),
 				Settings.System.SCREEN_BRIGHTNESS_MODE,
-				Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
+				Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);*/
 	}
 
 }

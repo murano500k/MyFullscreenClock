@@ -29,5 +29,9 @@ dependencies {
     compile 'com.android.support:support-v4:25.2.0'
     compile 'com.google.android.gms:play-services-appindexing:9.8.0'
     compile 'com.android.support:support-vector-drawable:25.2.0'
+    compile 'com.rarepebble:colorpicker:2.1.0'
+
+
+
     testCompile 'junit:junit:4.12'
 }

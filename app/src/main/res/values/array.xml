@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="fonts">
+        <item >Monospace</item>
+        <item >Serif</item>
+        <item >Bold</item>
+        <item >Default</item>
+    </array>
+    <array name="font_values">
+        <item >FONT_MONOSPACE</item>
+        <item >FONT_SERIF</item>
+        <item >FONT_BOLD</item>
+        <item >FONT_DEFAULT</item>
+    </array>
+</resources>

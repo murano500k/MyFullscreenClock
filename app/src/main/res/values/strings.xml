@@ -1,14 +1,11 @@
 <resources>
     <string name="app_name">MyFullscreenClock</string>
-
     <string name="title_activity_settings">Settings</string>
-
-    <string name="pref_header_appearance">Appearance</string>
-    <string name="pref_header_speak_time">Speak time preferences</string>
-
-    <string name="pref_title_auto_brightness">Enable Day/Night brightness</string>
     <string name="pref_description_auto_brightness">If on will set bright display at daytime and dark diplay at night</string>
-    <string name="pref_title_speak_time">Speak time</string>
     <string name="pref_description_speak_time">Enable/disable speaking time</string>
+    <string name="pref_title_auto_brightness">Auto brightness</string>
+    <string name="pref_title_speak_time">Speak time</string>
+    <string name="pref_title_font">Text font</string>
+    <string name="pref_title_color">Text color</string>
 
 </resources>

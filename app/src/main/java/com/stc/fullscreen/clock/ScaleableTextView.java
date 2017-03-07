@@ -24,18 +24,18 @@ public class ScaleableTextView extends TextView
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		if(mScaleDetector.onTouchEvent(event)) return true;
-		return super.onTouchEvent(event);
+		return false;
 	}
 
 	@Override
 	public boolean onScale(ScaleGestureDetector detector) {
 		Log.d(TAG, "onScale: "+detector.getScaleFactor());
 		float scaleFactor=detector.getScaleFactor();
-		if(scaleFactor>1.01) {
+		if(scaleFactor>1.05) {
 			incrementTextSize();
 			return true;
 		}
-		else if(scaleFactor<0.99) {
+		else if(scaleFactor<0.95) {
 			decrementTextSize();
 			return true;
 		}

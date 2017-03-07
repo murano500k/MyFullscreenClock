@@ -1,0 +1,28 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
+         dismiss it. -->
+    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+    <ListPreference
+        android:defaultValue="FONT_DEFAULT"
+        android:entries="@array/fonts"
+        android:entryValues="@array/font_values"
+        android:key="pref_font"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_title_font"/>
+    <com.rarepebble.colorpicker.ColorPreference
+        android:key="pref_color"
+        android:title="@string/pref_title_color"
+        android:defaultValue="#f00"
+        />
+    <SwitchPreference
+        android:defaultValue="disabled"
+        android:key="pref_speakTime"
+        android:title="@string/pref_title_speak_time"/>
+    <SwitchPreference
+        android:defaultValue="disabled"
+        android:key="pref_autoBr"
+        android:title="@string/pref_title_auto_brightness"/>
+
+</PreferenceScreen>
