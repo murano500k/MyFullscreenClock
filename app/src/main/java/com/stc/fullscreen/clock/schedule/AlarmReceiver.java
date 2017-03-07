@@ -1,4 +1,4 @@
-package com.stc.fullscreen.clock;
+package com.stc.fullscreen.clock.schedule;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;

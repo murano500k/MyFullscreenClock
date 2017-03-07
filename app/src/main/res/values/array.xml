@@ -1,15 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <array name="fonts">
-        <item >Monospace</item>
-        <item >Serif</item>
-        <item >Bold</item>
-        <item >Default</item>
-    </array>
-    <array name="font_values">
-        <item >FONT_MONOSPACE</item>
-        <item >FONT_SERIF</item>
-        <item >FONT_BOLD</item>
-        <item >FONT_DEFAULT</item>
+        <item>28DaysLater</item>
+        <item>android_7</item>
+        <item>AndroidInsomniaRegular</item>
+        <item>ANDROIDROBOT</item>
+        <item>athletic</item>
+        <item>digital-7</item>
+        <item>digital-7_mono</item>
+        <item>DIGITALDREAM</item>
+        <item>DIGITALDREAMFAT</item>
+        <item>DIGITALDREAMFATNARROW</item>
+        <item>DIGITALDREAMFATSKEW</item>
+        <item>DIGITALDREAMFATSKEWNARROW</item>
+        <item>DIGITALDREAMNARROW</item>
+        <item>DIGITALDREAMSKEW</item>
+        <item>DIGITALDREAMSKEWNARROW</item>
+        <item>MINECRAFTPE</item>
+        <item>OpenSans-Bold</item>
+        <item>OpenSans-BoldItalic</item>
+        <item>OpenSans-ExtraBold</item>
+        <item>OpenSans-ExtraBoldItalic</item>
+        <item>OpenSans-Italic</item>
+        <item>OpenSans-Light</item>
+        <item>OpenSans-LightItalic</item>
+        <item>OpenSans-Regular</item>
+        <item>OpenSans-Semibold</item>
+        <item>OpenSans-SemiboldItalic</item>
+        <item>Roboto-Black</item>
+        <item>Roboto-BlackItalic</item>
+        <item>Roboto-Bold</item>
+        <item>Roboto-BoldItalic</item>
+        <item>Roboto-Italic</item>
+        <item>Roboto-Light</item>
+        <item>Roboto-LightItalic</item>
+        <item>Roboto-Medium</item>
+        <item>Roboto-MediumItalic</item>
+        <item>Roboto-Regular</item>
+        <item>RobotoCondensed-Bold</item>
+        <item>RobotoCondensed-BoldItalic</item>
+        <item>RobotoCondensed-Italic</item>
+        <item>RobotoCondensed-Light</item>
+        <item>RobotoCondensed-LightItalic</item>
+        <item>RobotoCondensed-Regular</item>
+        <item>square_sans_serif_7</item>
+        <item>symbol</item>
+        <item>TickingTimebombBB</item>
+        <item>trs-million_rg</item>
     </array>
 </resources>
+

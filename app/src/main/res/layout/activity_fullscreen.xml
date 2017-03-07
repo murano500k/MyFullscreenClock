@@ -4,38 +4,42 @@
     android:layout_height="match_parent"
     android:background="@android:color/black"
                 android:id="@+id/fullscreen"
-    tools:context="com.stc.fullscreen.clock.FullscreenActivity">
+    tools:context="com.stc.fullscreen.clock.ui.FullscreenActivity">
 
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="false"
+        android:layout_centerVertical="true"
         android:layout_centerInParent="true">
 
-        <com.stc.fullscreen.clock.ScaleableTextView android:id="@+id/time_content"
-                                                    android:layout_width="match_parent"
-                                                    android:layout_height="wrap_content"
-                                                    android:keepScreenOn="true"
-                                                    android:textColor="#33b5e5"
-                                                    android:textSize="144sp"
-                                                    android:textStyle="bold"
-                                                    android:text="00:00:00"
-                                                    android:maxLines="1"
-                                                    android:gravity="center"/>
+        <com.stc.fullscreen.clock.utils.ScaleableTextView
+            android:id="@+id/time_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:keepScreenOn="true"
+            android:textColor="#33b5e5"
+            android:textSize="60sp"
+            android:text="00:00:00"
+            android:gravity="center"
 
-        <com.stc.fullscreen.clock.ScaleableTextView android:id="@+id/date_content"
-                                                    android:layout_width="match_parent"
-                                                    android:layout_height="wrap_content"
-                                                    android:keepScreenOn="true"
-                                                    android:textColor="#33b5e5"
-                                                    android:textSize="80sp"
-                                                    android:gravity="center"
-                                                    android:text="23 Dec"
-                                                    android:layout_marginBottom="32dp"
-                                                    android:layout_below="@+id/time_content"
-                                                    android:maxLines="1"/>
+            android:layout_gravity="center"
+            android:maxLines="1"/>
+
+        <com.stc.fullscreen.clock.utils.ScaleableTextView
+            android:id="@+id/date_content"
+
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:keepScreenOn="true"
+            android:textColor="#33b5e5"
+            android:textSize="60sp"
+            android:text="Tue 23 Dec"
+            android:layout_gravity="center"
+            android:layout_below="@+id/time_content"
+            android:maxLines="1"/>
     </LinearLayout>
 
 

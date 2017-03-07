@@ -1,4 +1,4 @@
-package com.stc.fullscreen.clock;
+package com.stc.fullscreen.clock.utils;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
