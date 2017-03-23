@@ -19,7 +19,7 @@ public class ScaleableTextView extends TextView
 
 	private static final String TAG = "ScaleableTextView";
 
-	private static final float TEXT_SIZE_INCR_STEP = 4.0f;
+	private static final float TEXT_SIZE_INCR_STEP = 5.0f;
 	private static final float TEXT_SCALE_TRIGGER_DELTA = 0.05f;
 
 	// larger value - smaller result
@@ -76,15 +76,16 @@ public class ScaleableTextView extends TextView
 
 	public void incrementTextSize(){
 		float oldSize=getTextSize();
-		Log.d(TAG, "incrementTextSize: "+oldSize+"+1");
-
-		setTextSize(TypedValue.COMPLEX_UNIT_PX, oldSize+TEXT_SIZE_INCR_STEP);
+		float newSize =oldSize+TEXT_SIZE_INCR_STEP;
+		Log.d(TAG, "incrementTextSize: "+oldSize+"->"+newSize+"px");
+		setTextSize(TypedValue.COMPLEX_UNIT_PX, newSize);
 		invalidate();
 	}
 	public void decrementTextSize(){
 		float oldSize=getTextSize();
-		Log.d(TAG, "decrementTextSize: "+oldSize+"-1");
-		setTextSize(TypedValue.COMPLEX_UNIT_PX, oldSize-2.0f);
+		float newSize =oldSize-TEXT_SIZE_INCR_STEP;
+		Log.d(TAG, "decrementTextSize: "+oldSize+"->"+"px");
+		setTextSize(TypedValue.COMPLEX_UNIT_PX, newSize);
 		invalidate();
 	}
 	@Override

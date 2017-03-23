@@ -53,7 +53,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
 	public static final String FONT_SERIF = "FONT_SERIF";
 	public static final String FONT_BOLD = "FONT_BOLD";
 	public static final String FONT_DEFAULT = "Roboto-Medium";
-	private static final int REQUEST_MANAGE_SYSTEM_SETTINGS = 367;
+	public static final int REQUEST_MANAGE_SYSTEM_SETTINGS = 367;
+	public static final String KEY_PREF_SHOW_MANUAL = "pref_showManual";
 
 
 	@Override
@@ -219,5 +220,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 	}
 
+	public static boolean shouldShowManual(Context c){
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
+		boolean res = prefs.getBoolean(KEY_PREF_SHOW_MANUAL, true);
+		if(res) prefs.edit().putBoolean(KEY_PREF_SHOW_MANUAL, false).apply();
+		return res;
+	}
 
 }

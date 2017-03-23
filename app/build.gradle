@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'irp2release'
+            keyPassword 'irpandroid'
+            storeFile file('/home/artem/projects/keystoreForMyApps/irp.jks')
+            storePassword 'irpandroid'
+        }
+    }
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
@@ -13,9 +21,17 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
+        debug {
+            debuggable true
+        }
         release {
             minifyEnabled false
+            shrinkResources false
+            debuggable false
+            jniDebuggable false
+            zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
     }
 }

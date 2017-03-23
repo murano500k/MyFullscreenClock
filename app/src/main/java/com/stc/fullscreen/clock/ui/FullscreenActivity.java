@@ -9,10 +9,10 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableStringBuilder;
 import android.util.Log;
@@ -100,7 +100,15 @@ public class FullscreenActivity extends AppCompatActivity {
 		findViewById(R.id.dummy_button).setOnClickListener(mButtonClickListener);
 		mTickListener.run();
 		applyPrefsValues();
+		if(SettingsActivity.shouldShowManual(this)) showManualDialog();
+	}
 
+	private void showManualDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Info")
+				.setCancelable(true)
+				.setMessage(R.string.info);
+		builder.create().show();
 	}
 
 	@Override
@@ -145,10 +153,6 @@ public class FullscreenActivity extends AppCompatActivity {
 	};
 
 
-	@Override
-	public void onStop() {
-		super.onStop();
-	}
 
 
 	private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
@@ -240,6 +244,11 @@ public class FullscreenActivity extends AppCompatActivity {
 		super.onDestroy();
 		mHandler.removeCallbacks(mTickListener);
 		mTimeView = null;
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
 		restoreUserBrSettings();
 		cancelAutoBrUpdate();
 	}
@@ -297,8 +306,8 @@ public class FullscreenActivity extends AppCompatActivity {
 				AlarmManager.INTERVAL_DAY, getAutoBrPi());
 
 		//now
-		alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-				SystemClock.elapsedRealtime(), getAutoBrPi());
+		alarmManager.set(AlarmManager.RTC_WAKEUP,
+				System.currentTimeMillis(), getAutoBrPi());
 	}
 
 	private void cancelAutoBrUpdate(){
