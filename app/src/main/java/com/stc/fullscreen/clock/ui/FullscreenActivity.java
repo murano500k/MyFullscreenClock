@@ -8,25 +8,20 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.SpannableStringBuilder;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.TextView;
 
 import com.stc.fullscreen.clock.R;
 import com.stc.fullscreen.clock.schedule.AlarmReceiver;
-import com.stc.fullscreen.clock.utils.ScaleableTextView;
+import com.stc.fullscreen.clock.utils.ScaleableTextClock;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Locale;
 
 import static com.stc.fullscreen.clock.schedule.AlarmReceiver.ACTION_SET_BRIGHTNESS;
 import static com.stc.fullscreen.clock.schedule.AlarmReceiver.HOUR_DAYTIME_STARTS;
@@ -42,39 +37,15 @@ public class FullscreenActivity extends AppCompatActivity {
 	private static final boolean AUTO_HIDE = true;
 	private static final int AUTO_HIDE_DELAY_MILLIS = 2000;
 	private static final int UI_ANIMATION_DELAY = 300;
-	public static final int REQUEST_CHANGE_BRIGHTNESS = 19932;
-	public static final int REQUEST_SPEAK = 74;
 	public static final int  REQUEST_CHANGE_SETTINGS = 43265;
 
-	public ScaleableTextView mTimeView;
-	public  ScaleableTextView mDateView;
+	public ScaleableTextClock mTimeView;
 	public  boolean mVisible;
 	public  static final int TICK_DELAY_MILLIS = 250;
 	public  static final String MY_TIME_FORMAT = "HH:mm:ss";
 	public  static final String MY_DATE_FORMAT= "EEE dd MMM";
 
 
-	private final Handler mHandler = new Handler(Looper.getMainLooper());
-	private final SimpleDateFormat mTimeFormat = new SimpleDateFormat(MY_TIME_FORMAT, Locale.US);
-	private final SimpleDateFormat mDateFormat = new SimpleDateFormat(MY_DATE_FORMAT, Locale.US);
-
-	private final Runnable mTickListener = new Runnable() {
-		@Override
-		public void run() {
-			updateTextViewWithFont(mTimeFormat.format(Calendar.getInstance().getTime()) ,mTimeView);
-			updateTextViewWithFont(mDateFormat.format(Calendar.getInstance().getTime()) ,mDateView);
-			mHandler.postDelayed(mTickListener, TICK_DELAY_MILLIS);
-		}
-	};
-
-	private void updateTextViewWithFont(String text, TextView tv){
-		SpannableStringBuilder sBuilder = new SpannableStringBuilder();
-		sBuilder.append(text); // Default TextView font.
-		String font = SettingsActivity.getSelectedFontFilePath(this);
-		Typeface typeface=Typeface.createFromAsset(FullscreenActivity.this.getAssets(), font );
-		tv.setTypeface(typeface);
-		tv.setText(sBuilder, TextView.BufferType.SPANNABLE);
-	}
 
 	private View mControlsView;
 	private View mAllView;
@@ -84,8 +55,7 @@ public class FullscreenActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_fullscreen);
 		mVisible = true;
-		mTimeView = (ScaleableTextView) findViewById(R.id.time_content);
-		mDateView = (ScaleableTextView) findViewById(R.id.date_content);
+		mTimeView = (ScaleableTextClock) findViewById(R.id.time_content);
 		mControlsView= findViewById(R.id.fullscreen_content_controls);
 		mAllView = findViewById(R.id.fullscreen);
 		mAllView.setOnClickListener(new View.OnClickListener() {
@@ -98,7 +68,6 @@ public class FullscreenActivity extends AppCompatActivity {
 		mAllView.setOnTouchListener(mDelayHideTouchListener);
 
 		findViewById(R.id.dummy_button).setOnClickListener(mButtonClickListener);
-		mTickListener.run();
 		applyPrefsValues();
 		if(SettingsActivity.shouldShowManual(this)) showManualDialog();
 	}
@@ -127,15 +96,14 @@ public class FullscreenActivity extends AppCompatActivity {
 
 		if(colorPref!=-1) {
 			mTimeView.setTextColor(colorPref);
-			mDateView.setTextColor(colorPref);
 		}
 		if(fontPref!=null) {
-			mTimeView.setTypeface(SettingsActivity.getTypefaceFromName(fontPref));
-			mDateView.setTypeface(SettingsActivity.getTypefaceFromName(fontPref));
+			String font = SettingsActivity.getSelectedFontFilePath(this);
+			Typeface typeface=Typeface.createFromAsset(FullscreenActivity.this.getAssets(), font );
+			mTimeView.setTypeface(typeface);
 		}
 		checkEnableAutoBrightness();
 	}
-
 
 
 	@Override
@@ -205,7 +173,6 @@ public class FullscreenActivity extends AppCompatActivity {
 				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
 		mVisible = true;
 
-		// Schedule a runnable to display UI elements after a delay
 		mHideHandler.removeCallbacks(mHidePart2Runnable);
 		mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
 	}
@@ -242,8 +209,6 @@ public class FullscreenActivity extends AppCompatActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		mHandler.removeCallbacks(mTickListener);
-		mTimeView = null;
 	}
 
 	@Override

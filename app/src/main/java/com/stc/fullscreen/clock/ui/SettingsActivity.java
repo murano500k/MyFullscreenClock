@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,7 +19,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 
@@ -34,8 +32,7 @@ import java.util.Date;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
-import static com.stc.fullscreen.clock.schedule.SpeakingService.ACTION_SPEAK_TIME;
-import static com.stc.fullscreen.clock.ui.FullscreenActivity.REQUEST_SPEAK;
+
 
 /**
  * Created by artem on 3/7/17.
@@ -96,23 +93,27 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
 		}
 	}
 	public void setActiveSpeakingTime(){
-		Intent intent=new Intent(this, SpeakingService.class);
 		String action;
 		AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-		PendingIntent pendingIntent= PendingIntent.getService(this, REQUEST_SPEAK, intent, 0);
+		PendingIntent pendingIntent= SpeakingService.getPendingIntent(this);
 		if(getPreferenceScreen().getSharedPreferences().getBoolean(KEY_PREF_SPEAK_TIME,false)){
 			action = "enabled";
-			intent.setAction(ACTION_SPEAK_TIME);
-			startService(intent);
+			try {
+				pendingIntent.send();
+			} catch (PendingIntent.CanceledException e) {
+				e.printStackTrace();
+			}
 			AlarmManager am=(AlarmManager) getSystemService(ALARM_SERVICE);
 			Calendar calendar=Calendar.getInstance();
 			Date date=calendar.getTime();
 			date.setMinutes(0);
-			int period = 1000*60*60;
+			int h=date.getHours()+1;
+			if(h>23) h=0;
+			date.setHours(h);
 			am.setRepeating(
-					AlarmManager.ELAPSED_REALTIME_WAKEUP,
+					AlarmManager.RTC_WAKEUP,
 					date.getTime(),
-					period,
+					AlarmManager.INTERVAL_HOUR,
 					pendingIntent
 			);
 		}else {
@@ -124,23 +125,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
 	public static boolean isAutoBrActive(Context c){
 		return getDefaultSharedPreferences(c).getBoolean(KEY_PREF_AUTO_BR,false);
 	}
-	public static Typeface getTypefaceFromName(String name){
-		if(TextUtils.equals(FONT_SERIF,name))return Typeface.SERIF;
-		if(TextUtils.equals(FONT_MONOSPACE,name))return Typeface.MONOSPACE;
-		if(TextUtils.equals(FONT_BOLD,name))return Typeface.DEFAULT_BOLD;
-		return Typeface.DEFAULT;
-	}
 	public static String getSelectedFontFilePath(Context c){
 		String fontName = PreferenceManager.getDefaultSharedPreferences(c).getString(KEY_PREF_FONT,FONT_DEFAULT);
 		String result = ""+fontName+".ttf";
-		//Log.d(TAG, "getSelectedFontFilePath: "+result);
 		return result;
-	}
-	public static String getNameFromTypeface(Typeface typeface){
-		if(typeface==Typeface.SERIF)return FONT_SERIF;
-		if(typeface==Typeface.MONOSPACE)return FONT_MONOSPACE;
-		if(typeface==Typeface.DEFAULT_BOLD)return FONT_BOLD;
-		return FONT_DEFAULT;
 	}
 	@Override
 	protected void onResume() {
