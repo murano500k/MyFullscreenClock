@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -19,14 +20,19 @@ import android.view.View;
 
 import com.stc.fullscreen.clock.R;
 import com.stc.fullscreen.clock.schedule.AlarmReceiver;
+import com.stc.fullscreen.clock.utils.AlertSoundReceiver;
 import com.stc.fullscreen.clock.utils.ScaleableTextClock;
 
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.stc.fullscreen.clock.schedule.AlarmReceiver.ACTION_SET_BRIGHTNESS;
 import static com.stc.fullscreen.clock.schedule.AlarmReceiver.HOUR_DAYTIME_STARTS;
 import static com.stc.fullscreen.clock.schedule.AlarmReceiver.HOUR_NIGHTTIME_STARTS;
 import static com.stc.fullscreen.clock.schedule.AlarmReceiver.REQUEST_SET_BRIGHTNESS;
+import static com.stc.fullscreen.clock.utils.AlertSoundReceiver.ACTION_PLAY_SOUND;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -39,7 +45,7 @@ public class FullscreenActivity extends AppCompatActivity {
 	private static final int UI_ANIMATION_DELAY = 300;
 	public static final int  REQUEST_CHANGE_SETTINGS = 43265;
 
-	public ScaleableTextClock mTimeView;
+	public ScaleableTextClock mTimeView, mDateView;
 	public  boolean mVisible;
 	public  static final int TICK_DELAY_MILLIS = 250;
 	public  static final String MY_TIME_FORMAT = "HH:mm:ss";
@@ -49,6 +55,8 @@ public class FullscreenActivity extends AppCompatActivity {
 
 	private View mControlsView;
 	private View mAllView;
+	private Timer timer;
+	private TimerTask timerTask;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +64,7 @@ public class FullscreenActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_fullscreen);
 		mVisible = true;
 		mTimeView = (ScaleableTextClock) findViewById(R.id.time_content);
+		mDateView = (ScaleableTextClock) findViewById(R.id.date_content);
 		mControlsView= findViewById(R.id.fullscreen_content_controls);
 		mAllView = findViewById(R.id.fullscreen);
 		mAllView.setOnClickListener(new View.OnClickListener() {
@@ -96,11 +105,14 @@ public class FullscreenActivity extends AppCompatActivity {
 
 		if(colorPref!=-1) {
 			mTimeView.setTextColor(colorPref);
+			mDateView.setTextColor(colorPref);
 		}
 		if(fontPref!=null) {
 			String font = SettingsActivity.getSelectedFontFilePath(this);
+			//Typeface typeface=getResources().getFont()
 			Typeface typeface=Typeface.createFromAsset(FullscreenActivity.this.getAssets(), font );
 			mTimeView.setTypeface(typeface);
+			mDateView.setTypeface(typeface);
 		}
 		checkEnableAutoBrightness();
 	}
@@ -163,6 +175,12 @@ public class FullscreenActivity extends AppCompatActivity {
 					| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
 					| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
 					| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+			mDateView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+					| View.SYSTEM_UI_FLAG_FULLSCREEN
+					| View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+					| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+					| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+					| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
 		}
 	};
 
@@ -170,6 +188,8 @@ public class FullscreenActivity extends AppCompatActivity {
 	private void show() {
 		// Show the system bar
 		mTimeView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+		mDateView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
 				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
 		mVisible = true;
 
@@ -287,4 +307,50 @@ public class FullscreenActivity extends AppCompatActivity {
 		return pi;
 	}
 
+	private void playSound(){
+		Log.d(TAG, "playSound: broadcast" );
+		LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(this, AlertSoundReceiver.class)
+		.setAction(ACTION_PLAY_SOUND));
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if(shouldSpeakTime())cancelTimerTask();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if(shouldSpeakTime())setTimerTask();
+		else Log.d(TAG, "onResume: no speak time");
+	}
+
+	private boolean shouldSpeakTime(){
+		return PreferenceManager.getDefaultSharedPreferences(this).getBoolean(SettingsActivity.KEY_PREF_SPEAK_TIME,false);
+	}
+	private void setTimerTask(){
+		if (timer == null) {
+			timer=new Timer();
+		}else timer.cancel();
+		if (timerTask == null) {
+			timerTask = new TimerTask() {
+				@Override
+				public void run() {
+					playSound();
+				}
+			};
+		}
+		Date date = new Date();
+		date.setHours(date.getHours()+1);
+		date.setMinutes(0);
+		date.setSeconds(0);
+		Log.d(TAG, "setTimerTask: "+date.toLocaleString());
+		timer.schedule(timerTask, date, 3600000);
+	}
+	private void cancelTimerTask(){
+		Log.d(TAG, "cancelTimerTask: ");
+		if(timer!=null) timer.cancel();
+		timer=null;
+	}
 }

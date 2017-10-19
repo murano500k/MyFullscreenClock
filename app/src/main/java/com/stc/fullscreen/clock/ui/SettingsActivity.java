@@ -35,7 +35,7 @@ import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 
 /**
- * Created by artem on 3/7/17.
+ * Created by artem on 3/7/1
  */
 
 public class SettingsActivity extends AppCompatPreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -84,7 +84,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
 		if (key.equals(KEY_PREF_AUTO_BR)) {
 			toggleAutoBrightnessChange();
 		}else if (key.equals(KEY_PREF_SPEAK_TIME)) {
-			setActiveSpeakingTime();
+			//setActiveSpeakingTime();
 		}else if(key.equals(KEY_PREF_COLOR)) {
 			ColorPreference colorPreference = (ColorPreference) pref;
 			colorPreference.setColor(sharedPreferences.getInt(key, 0xFF));
@@ -127,8 +127,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Sha
 	}
 	public static String getSelectedFontFilePath(Context c){
 		String fontName = PreferenceManager.getDefaultSharedPreferences(c).getString(KEY_PREF_FONT,FONT_DEFAULT);
-		String result = ""+fontName+".ttf";
-		return result;
+		return getSelectedFontFilePath(fontName);
+	}
+	public static String getSelectedFontFilePath(String fontName){
+		if(fontName==null) return null;
+		return ""+fontName+".ttf";
 	}
 	@Override
 	protected void onResume() {
