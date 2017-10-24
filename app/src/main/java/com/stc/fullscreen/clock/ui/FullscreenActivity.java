@@ -23,6 +23,7 @@ import com.stc.fullscreen.clock.schedule.AlarmReceiver;
 import com.stc.fullscreen.clock.utils.AlertSoundReceiver;
 import com.stc.fullscreen.clock.utils.ScaleableTextClock;
 
+import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
@@ -60,6 +61,8 @@ public class FullscreenActivity extends AppCompatActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		InputStream expectedStream = getClass().getClassLoader()
+				.getResourceAsStream("results." + nr + ".expected.txt");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_fullscreen);
 		mVisible = true;
